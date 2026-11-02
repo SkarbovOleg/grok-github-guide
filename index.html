@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Как Grok работает с GitHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --bg-card: #121826;
+      --bg-slide: #0f1524;
+      --accent: #3b82f6;
+      --accent-2: #8b5cf6;
+      --accent-3: #06b6d4;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --border: rgba(148, 163, 184, 0.12);
+      --success: #22c55e;
+      --warning: #f59e0b;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      background:
+        radial-gradient(ellipse 80% 50% at 20% -10%, rgba(59, 130, 246, 0.15), transparent),
+        radial-gradient(ellipse 60% 40% at 80% 110%, rgba(139, 92, 246, 0.12), transparent),
+        var(--bg);
+    }
+
+    .presentation {
+      height: 100vh;
+      width: 100vw;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .topbar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 32px;
+      pointer-events: none;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.02em;
+      pointer-events: auto;
+    }
+
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+    }
+
+    .progress-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      pointer-events: auto;
+    }
+
+    .progress-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .progress-bar {
+      width: 120px;
+      height: 4px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius: 99px;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Slides container */
+    .slides {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 80px 48px 100px;
+      opacity: 0;
+      transform: translateY(24px);
+      pointer-events: none;
+      transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .slide-inner {
+      max-width: 920px;
+      width: 100%;
+    }
+
+    /* Typography */
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-3);
+      margin-bottom: 20px;
+    }
+
+    .eyebrow::before {
+      content: '';
+      width: 18px;
+      height: 2px;
+      background: var(--accent-3);
+      border-radius: 2px;
+    }
+
+    h1 {
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #fff 30%, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .subtitle {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 640px;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* Cards grid */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 36px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .card:hover {
+      border-color: rgba(59, 130, 246, 0.35);
+      transform: translateY(-2px);
+    }
+
+    .card-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      margin-bottom: 14px;
+      background: rgba(59, 130, 246, 0.12);
+    }
+
+    .card h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+
+    /* Steps */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .step {
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .step h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .step p {
+      font-size: 0.9rem;
+    }
+
+    /* Code block */
+    .code-block {
+      background: #0a0e17;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 22px;
+      margin-top: 24px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      overflow-x: auto;
+    }
+
+    .code-block .comment { color: #64748b; }
+    .code-block .keyword { color: #c084fc; }
+    .code-block .string { color: #34d399; }
+    .code-block .fn { color: #60a5fa; }
+
+    /* Feature list */
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 28px;
+      margin-top: 28px;
+    }
+
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1rem;
+    }
+
+    .feature-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      flex-shrink: 0;
+    }
+
+    /* Big quote */
+    .quote {
+      font-size: 1.4rem;
+      font-weight: 500;
+      line-height: 1.5;
+      color: var(--text);
+      max-width: 700px;
+      border-left: 3px solid var(--accent);
+      padding-left: 24px;
+      margin-top: 12px;
+    }
+
+    /* Navigation */
+    .nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 32px 28px;
+      z-index: 50;
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: rgba(59, 130, 246, 0.4);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .dot.active {
+      background: var(--accent);
+      width: 24px;
+      border-radius: 99px;
+    }
+
+    /* Keyboard hint */
+    .kbd-hint {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: var(--text-muted);
+      opacity: 0.6;
+      display: none;
+    }
+
+    @media (min-width: 900px) {
+      .kbd-hint { display: block; }
+    }
+
+    /* Title slide special */
+    .slide-title .slide-inner {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .slide-title .subtitle {
+      text-align: center;
+    }
+
+    .badge-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .badge {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .badge strong {
+      color: var(--text);
+    }
+
+    /* End slide */
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 32px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      padding: 14px 28px;
+      border-radius: 14px;
+      font-weight: 600;
+      font-size: 1rem;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+    }
+
+    .cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(59, 130, 246, 0.4);
+    }
+
+    @media (max-width: 640px) {
+      .slide { padding: 70px 20px 110px; }
+      .features { grid-template-columns: 1fr; }
+      .topbar { padding: 14px 16px; }
+      .nav { padding: 16px; }
+      .progress-bar { width: 60px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="presentation">
+    <div class="topbar">
+      <div class="logo">
+        <div class="logo-icon">⚡</div>
+        Grok × GitHub
+      </div>
+      <div class="progress-wrap">
+        <span class="progress-text" id="progressText">1 / 8</span>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width: 12.5%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slides" id="slides">
+
+      <!-- 1. Title -->
+      <section class="slide slide-title active" data-index="0">
+        <div class="slide-inner">
+          <div class="eyebrow">Презентация</div>
+          <h1>Как Grok работает<br>с GitHub</h1>
+          <p class="subtitle">Полный гайд: подключение, создание репозиториев, загрузка кода и управление проектами прямо из чата.</p>
+          <div class="badge-row">
+            <span class="badge"><strong>Grok</strong> by xAI</span>
+            <span class="badge">GitHub Integration</span>
+            <span class="badge">2026</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Что это даёт -->
+      <section class="slide" data-index="1">
+        <div class="slide-inner">
+          <div class="eyebrow">Возможности</div>
+          <h2>Что Grok умеет делать<br>с твоим GitHub</h2>
+          <div class="cards">
+            <div class="card">
+              <div class="card-icon">📁</div>
+              <h3>Создавать репозитории</h3>
+              <p>Публичные и приватные, с README или без, в личном аккаунте или организации.</p>
+            </div>
+            <div class="card">
+              <div class="card-icon">⬆️</div>
+              <h3>Загружать код</h3>
+              <p>Один или много файлов за один коммит. Целые проекты целиком.</p>
+            </div>
+            <div class="card">
+              <div class="card-icon">🌿</div>
+              <h3>Ветки и PR</h3>
+              <p>Создавать ветки, пул-реквесты, просматривать diff и историю.</p>
+            </div>
+            <div class="card">
+              <div class="card-icon">🔍</div>
+              <h3>Читать и искать</h3>
+              <p>Смотреть структуру, содержимое файлов, искать по коду и репозиториям.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Подключение -->
+      <section class="slide" data-index="2">
+        <div class="slide-inner">
+          <div class="eyebrow">Первый шаг</div>
+          <h2>Как подключить GitHub</h2>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div>
+                <h3>Попросить подключить</h3>
+                <p>Напиши в чат: «подключи GitHub» или «хочу залить код в GitHub».</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div>
+                <h3>Нажать Connect</h3>
+                <p>Появится карточка. Нажми кнопку подключения — откроется GitHub OAuth.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div>
+                <h3>Разрешить доступ</h3>
+                <p>Войди в аккаунт и выбери права (обычно All repositories или конкретные).</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div>
+                <h3>Готово</h3>
+                <p>Вернись в чат и напиши «Connected» или просто дай следующую задачу.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Процесс работы -->
+      <section class="slide" data-index="3">
+        <div class="slide-inner">
+          <div class="eyebrow">Как это выглядит</div>
+          <h2>Типичный сценарий</h2>
+          <p style="margin-bottom: 8px;">Ты говоришь задачу — Grok делает всё сам:</p>
+          <div class="code-block">
+<span class="comment">// Ты пишешь:</span><br>
+«Сделай сайт-презентацию и залей в GitHub»<br><br>
+<span class="comment">// Grok внутри делает:</span><br>
+<span class="fn">create_repository</span>(name: <span class="string">"grok-github-guide"</span>)<br>
+<span class="fn">push_files</span>(files: [index.html, ...], message: <span class="string">"Add presentation"</span>)<br><br>
+<span class="comment">// Ты получаешь:</span><br>
+Готовый репозиторий + ссылку
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Что происходит под капотом -->
+      <section class="slide" data-index="4">
+        <div class="slide-inner">
+          <div class="eyebrow">Технически</div>
+          <h2>Что происходит<br>«под капотом»</h2>
+          <div class="features">
+            <div class="feature"><span class="feature-dot"></span> OAuth-авторизация через GitHub</div>
+            <div class="feature"><span class="feature-dot"></span> Работа через официальный API</div>
+            <div class="feature"><span class="feature-dot"></span> Коммиты от твоего имени</div>
+            <div class="feature"><span class="feature-dot"></span> Поддержка веток и PR</div>
+            <div class="feature"><span class="feature-dot"></span> Чтение любых репозиториев</div>
+            <div class="feature"><span class="feature-dot"></span> Поиск по коду и репо</div>
+            <div class="feature"><span class="feature-dot"></span> Создание и обновление файлов</div>
+            <div class="feature"><span class="feature-dot"></span> Безопасный доступ (можно отозвать)</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Примеры команд -->
+      <section class="slide" data-index="5">
+        <div class="slide-inner">
+          <div class="eyebrow">Примеры</div>
+          <h2>Что можно сказать</h2>
+          <div class="cards" style="grid-template-columns: 1fr;">
+            <div class="card">
+              <h3>«Покажи мои репозитории»</h3>
+              <p>Grok выведет список всех репо с описаниями и ссылками.</p>
+            </div>
+            <div class="card">
+              <h3>«Создай репозиторий my-app и залей туда React-проект»</h3>
+              <p>Создаст репо, напишет код и сделает первый коммит.</p>
+            </div>
+            <div class="card">
+              <h3>«Посмотри файл index.html в репозитории boots»</h3>
+              <p>Прочитает содержимое и объяснит / предложит правки.</p>
+            </div>
+            <div class="card">
+              <h3>«Сделай ветку feature/login и создай pull request»</h3>
+              <p>Создаст ветку, закоммитит изменения и откроет PR.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. Безопасность -->
+      <section class="slide" data-index="6">
+        <div class="slide-inner">
+          <div class="eyebrow">Важно</div>
+          <h2>Безопасность и контроль</h2>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">🔒</div>
+              <div>
+                <h3>Ты решаешь, что доступно</h3>
+                <p>При подключении можно дать доступ только к выбранным репозиториям.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">↩️</div>
+              <div>
+                <h3>Можно отозвать в любой момент</h3>
+                <p>GitHub → Settings → Applications → Authorized OAuth Apps.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">👁️</div>
+              <div>
+                <h3>Все действия видны</h3>
+                <p>Каждый коммит и PR появляются в истории репозитория от твоего имени.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. Финал -->
+      <section class="slide slide-title" data-index="7">
+        <div class="slide-inner">
+          <div class="eyebrow">Итог</div>
+          <h1>Grok + GitHub =<br>разработка в чате</h1>
+          <p class="subtitle">Просто опиши, что нужно — репозиторий, код, коммит и ссылка появятся сами.</p>
+          <a class="cta" href="https://github.com/SkarbovOleg/grok-github-guide" target="_blank">
+            Открыть этот репозиторий →
+          </a>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="nav">
+      <button class="nav-btn" id="prevBtn" disabled>← Назад</button>
+      <div class="dots" id="dots"></div>
+      <button class="nav-btn" id="nextBtn">Далее →</button>
+    </div>
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const total = slides.length;
+    let current = 0;
+
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const progressText = document.getElementById('progressText');
+    const progressFill = document.getElementById('progressFill');
+    const dotsContainer = document.getElementById('dots');
+
+    // Create dots
+    for (let i = 0; i < total; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dot.addEventListener('click', () => goTo(i));
+      dotsContainer.appendChild(dot);
+    }
+
+    function updateUI() {
+      slides.forEach((s, i) => s.classList.toggle('active', i === current));
+      document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+      progressText.textContent = `${current + 1} / ${total}`;
+      progressFill.style.width = `${((current + 1) / total) * 100}%`;
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === total - 1;
+      nextBtn.textContent = current === total - 1 ? 'Готово' : 'Далее →';
+    }
+
+    function goTo(index) {
+      if (index < 0 || index >= total) return;
+      current = index;
+      updateUI();
+    }
+
+    prevBtn.addEventListener('click', () => goTo(current - 1));
+    nextBtn.addEventListener('click', () => {
+      if (current < total - 1) goTo(current + 1);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        goTo(current + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        goTo(current - 1);
+      } else if (e.key === 'Home') {
+        goTo(0);
+      } else if (e.key === 'End') {
+        goTo(total - 1);
+      }
+    });
+
+    // Touch swipe
+    let touchStartX = 0;
+    document.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    document.addEventListener('touchend', e => {
+      const diff = e.changedTouches[0].screenX - touchStartX;
+      if (Math.abs(diff) > 50) {
+        if (diff < 0) goTo(current + 1);
+        else goTo(current - 1);
+      }
+    }, { passive: true });
+
+    updateUI();
+  </script>
+</body>
+</html>
