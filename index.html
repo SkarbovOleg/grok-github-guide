@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Как Grok работает с GitHub</title>
+  <title>Grok × GitHub — Презентации</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -11,7 +11,6 @@
     :root {
       --bg: #0b0f19;
       --bg-card: #121826;
-      --bg-slide: #0f1524;
       --accent: #3b82f6;
       --accent-2: #8b5cf6;
       --accent-3: #06b6d4;
@@ -19,23 +18,9 @@
       --text-muted: #94a3b8;
       --border: rgba(148, 163, 184, 0.12);
       --success: #22c55e;
-      --warning: #f59e0b;
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    html, body {
-      height: 100%;
-      overflow: hidden;
-      font-family: 'Inter', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); }
     body {
       background:
         radial-gradient(ellipse 80% 50% at 20% -10%, rgba(59, 130, 246, 0.15), transparent),
@@ -43,720 +28,817 @@
         var(--bg);
     }
 
-    .presentation {
+    /* ========== MENU ========== */
+    #menu {
       height: 100vh;
-      width: 100vw;
-      position: relative;
+      overflow-y: auto;
+      padding: 48px 24px 64px;
       display: flex;
       flex-direction: column;
-    }
-
-    /* Header */
-    .topbar {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 50;
-      display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 18px 32px;
-      pointer-events: none;
     }
-
-    .logo {
-      display: flex;
+    .menu-header {
+      text-align: center;
+      margin-bottom: 48px;
+      max-width: 640px;
+    }
+    .menu-header .logo {
+      display: inline-flex;
       align-items: center;
       gap: 10px;
       font-weight: 700;
       font-size: 15px;
-      letter-spacing: -0.02em;
-      pointer-events: auto;
-    }
-
-    .logo-icon {
-      width: 28px;
-      height: 28px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      font-size: 14px;
-    }
-
-    .progress-wrap {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      pointer-events: auto;
-    }
-
-    .progress-text {
-      font-size: 13px;
-      color: var(--text-muted);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .progress-bar {
-      width: 120px;
-      height: 4px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 99px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      border-radius: 99px;
-      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* Slides container */
-    .slides {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .slide {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 80px 48px 100px;
-      opacity: 0;
-      transform: translateY(24px);
-      pointer-events: none;
-      transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .slide.active {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
-
-    .slide-inner {
-      max-width: 920px;
-      width: 100%;
-    }
-
-    /* Typography */
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--accent-3);
       margin-bottom: 20px;
     }
-
-    .eyebrow::before {
-      content: '';
-      width: 18px;
-      height: 2px;
-      background: var(--accent-3);
-      border-radius: 2px;
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-radius: 9px;
+      display: grid; place-items: center;
+      font-size: 16px;
     }
-
-    h1 {
-      font-size: clamp(2.4rem, 5vw, 3.6rem);
+    .menu-header h1 {
+      font-size: clamp(2rem, 4.5vw, 2.8rem);
       font-weight: 800;
       letter-spacing: -0.04em;
-      line-height: 1.1;
-      margin-bottom: 20px;
+      line-height: 1.15;
+      margin-bottom: 12px;
       background: linear-gradient(135deg, #fff 30%, #94a3b8);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-
-    h2 {
-      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 1.15;
-      margin-bottom: 16px;
-    }
-
-    .subtitle {
-      font-size: 1.25rem;
+    .menu-header p {
       color: var(--text-muted);
+      font-size: 1.05rem;
       line-height: 1.6;
-      max-width: 640px;
     }
-
-    p {
-      font-size: 1.1rem;
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      max-width: 960px;
+      width: 100%;
+    }
+    .menu-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px 24px;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      text-align: left;
+      font-family: inherit;
+      color: inherit;
+    }
+    .menu-card:hover {
+      border-color: rgba(59, 130, 246, 0.45);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+    }
+    .menu-card .num {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-3);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .menu-card h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    .menu-card p {
+      font-size: 0.9rem;
       color: var(--text-muted);
-      line-height: 1.7;
+      line-height: 1.55;
+    }
+    .menu-card .slides-count {
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+      opacity: 0.7;
     }
 
-    /* Cards grid */
+    /* ========== PRESENTATION ========== */
+    #presentation {
+      display: none;
+      height: 100vh;
+      width: 100vw;
+      position: relative;
+      flex-direction: column;
+    }
+    #presentation.active { display: flex; }
+
+    .topbar {
+      position: absolute; top: 0; left: 0; right: 0; z-index: 50;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 28px; pointer-events: none;
+    }
+    .topbar-left {
+      display: flex; align-items: center; gap: 14px; pointer-events: auto;
+    }
+    .btn-menu {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s;
+    }
+    .btn-menu:hover { background: rgba(59,130,246,0.15); }
+    .pres-title {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .progress-wrap {
+      display: flex; align-items: center; gap: 12px; pointer-events: auto;
+    }
+    .progress-text {
+      font-size: 13px; color: var(--text-muted); font-variant-numeric: tabular-nums;
+    }
+    .progress-bar {
+      width: 100px; height: 4px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 99px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius: 99px;
+      transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .slides-area {
+      flex: 1; position: relative; overflow: hidden;
+    }
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      padding: 80px 40px 100px;
+      opacity: 0; transform: translateY(20px);
+      pointer-events: none;
+      transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .slide.active {
+      opacity: 1; transform: translateY(0); pointer-events: auto;
+    }
+    .slide-inner { max-width: 900px; width: 100%; }
+
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--accent-3); margin-bottom: 18px;
+    }
+    .eyebrow::before {
+      content: ''; width: 16px; height: 2px;
+      background: var(--accent-3); border-radius: 2px;
+    }
+    h1.slide-h {
+      font-size: clamp(2.1rem, 4.5vw, 3.2rem);
+      font-weight: 800; letter-spacing: -0.04em; line-height: 1.12;
+      margin-bottom: 18px;
+      background: linear-gradient(135deg, #fff 30%, #94a3b8);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    h2.slide-h {
+      font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+      font-weight: 700; letter-spacing: -0.03em; line-height: 1.2;
+      margin-bottom: 14px;
+    }
+    .subtitle {
+      font-size: 1.15rem; color: var(--text-muted); line-height: 1.6; max-width: 620px;
+    }
+    p { font-size: 1.05rem; color: var(--text-muted); line-height: 1.65; }
+
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
-      margin-top: 36px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px; margin-top: 28px;
     }
-
     .card {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
+      border-radius: 14px;
+      padding: 20px;
       transition: border-color 0.2s, transform 0.2s;
     }
-
-    .card:hover {
-      border-color: rgba(59, 130, 246, 0.35);
-      transform: translateY(-2px);
-    }
-
+    .card:hover { border-color: rgba(59,130,246,0.35); transform: translateY(-2px); }
     .card-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      display: grid;
-      place-items: center;
-      font-size: 20px;
-      margin-bottom: 14px;
-      background: rgba(59, 130, 246, 0.12);
+      width: 38px; height: 38px; border-radius: 10px;
+      display: grid; place-items: center; font-size: 18px; margin-bottom: 12px;
+      background: rgba(59,130,246,0.12);
     }
+    .card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
+    .card p { font-size: 0.88rem; line-height: 1.5; }
 
-    .card h3 {
-      font-size: 1.05rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .card p {
-      font-size: 0.9rem;
-      line-height: 1.55;
-    }
-
-    /* Steps */
-    .steps {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      margin-top: 28px;
-    }
-
+    .steps { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
     .step {
-      display: flex;
-      gap: 18px;
-      align-items: flex-start;
+      display: flex; gap: 16px; align-items: flex-start;
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 18px 20px;
+      border-radius: 12px;
+      padding: 16px 18px;
     }
-
     .step-num {
-      flex-shrink: 0;
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
+      flex-shrink: 0; width: 32px; height: 32px; border-radius: 9px;
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      display: grid;
-      place-items: center;
-      font-weight: 700;
-      font-size: 14px;
+      display: grid; place-items: center; font-weight: 700; font-size: 13px;
     }
+    .step h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 3px; }
+    .step p { font-size: 0.88rem; }
 
-    .step h3 {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .step p {
-      font-size: 0.9rem;
-    }
-
-    /* Code block */
     .code-block {
       background: #0a0e17;
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px 22px;
-      margin-top: 24px;
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-top: 20px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       line-height: 1.7;
       overflow-x: auto;
     }
-
     .code-block .comment { color: #64748b; }
-    .code-block .keyword { color: #c084fc; }
-    .code-block .string { color: #34d399; }
     .code-block .fn { color: #60a5fa; }
+    .code-block .string { color: #34d399; }
 
-    /* Feature list */
     .features {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px 28px;
-      margin-top: 28px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px 24px; margin-top: 24px;
     }
-
     .feature {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 1rem;
+      display: flex; align-items: center; gap: 10px; font-size: 0.95rem;
     }
-
     .feature-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--success);
-      flex-shrink: 0;
-    }
-
-    /* Big quote */
-    .quote {
-      font-size: 1.4rem;
-      font-weight: 500;
-      line-height: 1.5;
-      color: var(--text);
-      max-width: 700px;
-      border-left: 3px solid var(--accent);
-      padding-left: 24px;
-      margin-top: 12px;
-    }
-
-    /* Navigation */
-    .nav {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 32px 28px;
-      z-index: 50;
-    }
-
-    .nav-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 12px 20px;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: inherit;
-    }
-
-    .nav-btn:hover:not(:disabled) {
-      background: rgba(59, 130, 246, 0.15);
-      border-color: rgba(59, 130, 246, 0.4);
-    }
-
-    .nav-btn:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-    }
-
-    .dots {
-      display: flex;
-      gap: 8px;
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.15);
-      cursor: pointer;
-      transition: all 0.25s;
-    }
-
-    .dot.active {
-      background: var(--accent);
-      width: 24px;
-      border-radius: 99px;
-    }
-
-    /* Keyboard hint */
-    .kbd-hint {
-      position: absolute;
-      bottom: 32px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 12px;
-      color: var(--text-muted);
-      opacity: 0.6;
-      display: none;
-    }
-
-    @media (min-width: 900px) {
-      .kbd-hint { display: block; }
-    }
-
-    /* Title slide special */
-    .slide-title .slide-inner {
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .slide-title .subtitle {
-      text-align: center;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--success); flex-shrink: 0;
     }
 
     .badge-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 32px;
-      flex-wrap: wrap;
-      justify-content: center;
+      display: flex; gap: 10px; margin-top: 28px; flex-wrap: wrap; justify-content: center;
     }
-
     .badge {
       background: rgba(255,255,255,0.05);
       border: 1px solid var(--border);
-      padding: 8px 14px;
-      border-radius: 99px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-muted);
+      padding: 7px 13px; border-radius: 99px;
+      font-size: 12px; font-weight: 500; color: var(--text-muted);
     }
+    .badge strong { color: var(--text); }
 
-    .badge strong {
+    .slide-title .slide-inner {
+      text-align: center; display: flex; flex-direction: column; align-items: center;
+    }
+    .slide-title .subtitle { text-align: center; }
+
+    .nav {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 28px 24px; z-index: 50;
+    }
+    .nav-btn {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
       color: var(--text);
+      padding: 11px 18px; border-radius: 11px;
+      font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s; font-family: inherit;
     }
-
-    /* End slide */
-    .cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 32px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: white;
-      padding: 14px 28px;
-      border-radius: 14px;
-      font-weight: 600;
-      font-size: 1rem;
-      text-decoration: none;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+    .nav-btn:hover:not(:disabled) {
+      background: rgba(59,130,246,0.15);
+      border-color: rgba(59,130,246,0.4);
     }
-
-    .cta:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 32px rgba(59, 130, 246, 0.4);
+    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .dots { display: flex; gap: 7px; }
+    .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: rgba(255,255,255,0.15); cursor: pointer; transition: all 0.25s;
+    }
+    .dot.active {
+      background: var(--accent); width: 22px; border-radius: 99px;
     }
 
     @media (max-width: 640px) {
-      .slide { padding: 70px 20px 110px; }
+      .slide { padding: 70px 18px 100px; }
       .features { grid-template-columns: 1fr; }
-      .topbar { padding: 14px 16px; }
-      .nav { padding: 16px; }
-      .progress-bar { width: 60px; }
+      .topbar { padding: 12px 14px; }
+      .nav { padding: 14px; }
+      .progress-bar { width: 50px; }
+      .menu-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <div class="presentation">
-    <div class="topbar">
+
+  <!-- ========== MENU ========== -->
+  <div id="menu">
+    <div class="menu-header">
       <div class="logo">
         <div class="logo-icon">⚡</div>
         Grok × GitHub
       </div>
+      <h1>Презентации</h1>
+      <p>Выбери тему — интерактивные слайды про работу Grok с GitHub</p>
+    </div>
+    <div class="menu-grid" id="menuGrid"></div>
+  </div>
+
+  <!-- ========== PRESENTATION VIEW ========== -->
+  <div id="presentation">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="btn-menu" id="backToMenu">← Меню</button>
+        <span class="pres-title" id="presTitle"></span>
+      </div>
       <div class="progress-wrap">
-        <span class="progress-text" id="progressText">1 / 8</span>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progressFill" style="width: 12.5%"></div>
-        </div>
+        <span class="progress-text" id="progressText">1 / 1</span>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
       </div>
     </div>
-
-    <div class="slides" id="slides">
-
-      <!-- 1. Title -->
-      <section class="slide slide-title active" data-index="0">
-        <div class="slide-inner">
-          <div class="eyebrow">Презентация</div>
-          <h1>Как Grok работает<br>с GitHub</h1>
-          <p class="subtitle">Полный гайд: подключение, создание репозиториев, загрузка кода и управление проектами прямо из чата.</p>
-          <div class="badge-row">
-            <span class="badge"><strong>Grok</strong> by xAI</span>
-            <span class="badge">GitHub Integration</span>
-            <span class="badge">2026</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- 2. Что это даёт -->
-      <section class="slide" data-index="1">
-        <div class="slide-inner">
-          <div class="eyebrow">Возможности</div>
-          <h2>Что Grok умеет делать<br>с твоим GitHub</h2>
-          <div class="cards">
-            <div class="card">
-              <div class="card-icon">📁</div>
-              <h3>Создавать репозитории</h3>
-              <p>Публичные и приватные, с README или без, в личном аккаунте или организации.</p>
-            </div>
-            <div class="card">
-              <div class="card-icon">⬆️</div>
-              <h3>Загружать код</h3>
-              <p>Один или много файлов за один коммит. Целые проекты целиком.</p>
-            </div>
-            <div class="card">
-              <div class="card-icon">🌿</div>
-              <h3>Ветки и PR</h3>
-              <p>Создавать ветки, пул-реквесты, просматривать diff и историю.</p>
-            </div>
-            <div class="card">
-              <div class="card-icon">🔍</div>
-              <h3>Читать и искать</h3>
-              <p>Смотреть структуру, содержимое файлов, искать по коду и репозиториям.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 3. Подключение -->
-      <section class="slide" data-index="2">
-        <div class="slide-inner">
-          <div class="eyebrow">Первый шаг</div>
-          <h2>Как подключить GitHub</h2>
-          <div class="steps">
-            <div class="step">
-              <div class="step-num">1</div>
-              <div>
-                <h3>Попросить подключить</h3>
-                <p>Напиши в чат: «подключи GitHub» или «хочу залить код в GitHub».</p>
-              </div>
-            </div>
-            <div class="step">
-              <div class="step-num">2</div>
-              <div>
-                <h3>Нажать Connect</h3>
-                <p>Появится карточка. Нажми кнопку подключения — откроется GitHub OAuth.</p>
-              </div>
-            </div>
-            <div class="step">
-              <div class="step-num">3</div>
-              <div>
-                <h3>Разрешить доступ</h3>
-                <p>Войди в аккаунт и выбери права (обычно All repositories или конкретные).</p>
-              </div>
-            </div>
-            <div class="step">
-              <div class="step-num">4</div>
-              <div>
-                <h3>Готово</h3>
-                <p>Вернись в чат и напиши «Connected» или просто дай следующую задачу.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 4. Процесс работы -->
-      <section class="slide" data-index="3">
-        <div class="slide-inner">
-          <div class="eyebrow">Как это выглядит</div>
-          <h2>Типичный сценарий</h2>
-          <p style="margin-bottom: 8px;">Ты говоришь задачу — Grok делает всё сам:</p>
-          <div class="code-block">
-<span class="comment">// Ты пишешь:</span><br>
-«Сделай сайт-презентацию и залей в GitHub»<br><br>
-<span class="comment">// Grok внутри делает:</span><br>
-<span class="fn">create_repository</span>(name: <span class="string">"grok-github-guide"</span>)<br>
-<span class="fn">push_files</span>(files: [index.html, ...], message: <span class="string">"Add presentation"</span>)<br><br>
-<span class="comment">// Ты получаешь:</span><br>
-Готовый репозиторий + ссылку
-          </div>
-        </div>
-      </section>
-
-      <!-- 5. Что происходит под капотом -->
-      <section class="slide" data-index="4">
-        <div class="slide-inner">
-          <div class="eyebrow">Технически</div>
-          <h2>Что происходит<br>«под капотом»</h2>
-          <div class="features">
-            <div class="feature"><span class="feature-dot"></span> OAuth-авторизация через GitHub</div>
-            <div class="feature"><span class="feature-dot"></span> Работа через официальный API</div>
-            <div class="feature"><span class="feature-dot"></span> Коммиты от твоего имени</div>
-            <div class="feature"><span class="feature-dot"></span> Поддержка веток и PR</div>
-            <div class="feature"><span class="feature-dot"></span> Чтение любых репозиториев</div>
-            <div class="feature"><span class="feature-dot"></span> Поиск по коду и репо</div>
-            <div class="feature"><span class="feature-dot"></span> Создание и обновление файлов</div>
-            <div class="feature"><span class="feature-dot"></span> Безопасный доступ (можно отозвать)</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 6. Примеры команд -->
-      <section class="slide" data-index="5">
-        <div class="slide-inner">
-          <div class="eyebrow">Примеры</div>
-          <h2>Что можно сказать</h2>
-          <div class="cards" style="grid-template-columns: 1fr;">
-            <div class="card">
-              <h3>«Покажи мои репозитории»</h3>
-              <p>Grok выведет список всех репо с описаниями и ссылками.</p>
-            </div>
-            <div class="card">
-              <h3>«Создай репозиторий my-app и залей туда React-проект»</h3>
-              <p>Создаст репо, напишет код и сделает первый коммит.</p>
-            </div>
-            <div class="card">
-              <h3>«Посмотри файл index.html в репозитории boots»</h3>
-              <p>Прочитает содержимое и объяснит / предложит правки.</p>
-            </div>
-            <div class="card">
-              <h3>«Сделай ветку feature/login и создай pull request»</h3>
-              <p>Создаст ветку, закоммитит изменения и откроет PR.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 7. Безопасность -->
-      <section class="slide" data-index="6">
-        <div class="slide-inner">
-          <div class="eyebrow">Важно</div>
-          <h2>Безопасность и контроль</h2>
-          <div class="steps">
-            <div class="step">
-              <div class="step-num">🔒</div>
-              <div>
-                <h3>Ты решаешь, что доступно</h3>
-                <p>При подключении можно дать доступ только к выбранным репозиториям.</p>
-              </div>
-            </div>
-            <div class="step">
-              <div class="step-num">↩️</div>
-              <div>
-                <h3>Можно отозвать в любой момент</h3>
-                <p>GitHub → Settings → Applications → Authorized OAuth Apps.</p>
-              </div>
-            </div>
-            <div class="step">
-              <div class="step-num">👁️</div>
-              <div>
-                <h3>Все действия видны</h3>
-                <p>Каждый коммит и PR появляются в истории репозитория от твоего имени.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 8. Финал -->
-      <section class="slide slide-title" data-index="7">
-        <div class="slide-inner">
-          <div class="eyebrow">Итог</div>
-          <h1>Grok + GitHub =<br>разработка в чате</h1>
-          <p class="subtitle">Просто опиши, что нужно — репозиторий, код, коммит и ссылка появятся сами.</p>
-          <a class="cta" href="https://github.com/SkarbovOleg/grok-github-guide" target="_blank">
-            Открыть этот репозиторий →
-          </a>
-        </div>
-      </section>
-
-    </div>
-
+    <div class="slides-area" id="slidesArea"></div>
     <div class="nav">
-      <button class="nav-btn" id="prevBtn" disabled>← Назад</button>
+      <button class="nav-btn" id="prevBtn">← Назад</button>
       <div class="dots" id="dots"></div>
       <button class="nav-btn" id="nextBtn">Далее →</button>
     </div>
   </div>
 
   <script>
-    const slides = document.querySelectorAll('.slide');
-    const total = slides.length;
-    let current = 0;
+    const presentations = [
+      {
+        id: "intro",
+        title: "Как Grok работает с GitHub",
+        desc: "Обзор интеграции: что умеет Grok и как выглядит типичный сценарий",
+        slidesCount: 6,
+        slides: [
+          {
+            type: "title",
+            eyebrow: "Презентация 1",
+            h1: "Как Grok работает<br>с GitHub",
+            subtitle: "Полный гайд: подключение, создание репозиториев, загрузка кода и управление проектами прямо из чата.",
+            badges: ["Grok by xAI", "GitHub Integration", "2026"]
+          },
+          {
+            type: "cards",
+            eyebrow: "Возможности",
+            h2: "Что Grok умеет делать<br>с твоим GitHub",
+            cards: [
+              { icon: "📁", title: "Создавать репозитории", text: "Публичные и приватные, с README или без, в личном аккаунте или организации." },
+              { icon: "⬆️", title: "Загружать код", text: "Один или много файлов за один коммит. Целые проекты целиком." },
+              { icon: "🌿", title: "Ветки и PR", text: "Создавать ветки, пул-реквесты, просматривать diff и историю." },
+              { icon: "🔍", title: "Читать и искать", text: "Смотреть структуру, содержимое файлов, искать по коду и репозиториям." }
+            ]
+          },
+          {
+            type: "steps",
+            eyebrow: "Первый шаг",
+            h2: "Как подключить GitHub",
+            steps: [
+              { num: "1", title: "Попросить подключить", text: "Напиши в чат: «подключи GitHub» или «хочу залить код в GitHub»." },
+              { num: "2", title: "Нажать Connect", text: "Появится карточка. Нажми кнопку подключения — откроется GitHub OAuth." },
+              { num: "3", title: "Разрешить доступ", text: "Войди в аккаунт и выбери права (All repositories или конкретные)." },
+              { num: "4", title: "Готово", text: "Вернись в чат и напиши «Connected» или просто дай следующую задачу." }
+            ]
+          },
+          {
+            type: "code",
+            eyebrow: "Как это выглядит",
+            h2: "Типичный сценарий",
+            intro: "Ты говоришь задачу — Grok делает всё сам:",
+            code: `<span class="comment">// Ты пишешь:</span><br>«Сделай сайт-презентацию и залей в GitHub»<br><br><span class="comment">// Grok внутри делает:</span><br><span class="fn">create_repository</span>(name: <span class="string">"grok-github-guide"</span>)<br><span class="fn">push_files</span>(files: [index.html, ...], message: <span class="string">"Add presentation"</span>)<br><br><span class="comment">// Ты получаешь:</span><br>Готовый репозиторий + ссылку`
+          },
+          {
+            type: "features",
+            eyebrow: "Технически",
+            h2: "Что происходит «под капотом»",
+            features: [
+              "OAuth-авторизация через GitHub",
+              "Работа через официальный API",
+              "Коммиты от твоего имени",
+              "Поддержка веток и PR",
+              "Чтение любых репозиториев",
+              "Поиск по коду и репо",
+              "Создание и обновление файлов",
+              "Безопасный доступ (можно отозвать)"
+            ]
+          },
+          {
+            type: "title",
+            eyebrow: "Итог",
+            h1: "Grok + GitHub =<br>разработка в чате",
+            subtitle: "Просто опиши, что нужно — репозиторий, код, коммит и ссылка появятся сами."
+          }
+        ]
+      },
+      {
+        id: "create",
+        title: "Создание репозиториев и загрузка кода",
+        desc: "Как просить Grok создать репо, залить файлы и сделать первый коммит",
+        slidesCount: 5,
+        slides: [
+          {
+            type: "title",
+            eyebrow: "Презентация 2",
+            h1: "Создание репозиториев<br>и загрузка кода",
+            subtitle: "От пустого репозитория до готового проекта — одной фразой в чате."
+          },
+          {
+            type: "cards",
+            eyebrow: "Что можно сделать",
+            h2: "Основные действия",
+            cards: [
+              { icon: "🆕", title: "Новый репозиторий", text: "Публичный или приватный, с авто-README или полностью пустой." },
+              { icon: "📄", title: "Один файл", text: "Создать или обновить отдельный файл с коммитом." },
+              { icon: "📦", title: "Много файлов", text: "Залить целый проект одним коммитом (push_files)." },
+              { icon: "✏️", title: "Обновить существующий", text: "Изменить код в уже существующем файле репозитория." }
+            ]
+          },
+          {
+            type: "steps",
+            eyebrow: "Как просить",
+            h2: "Примеры команд",
+            steps: [
+              { num: "1", title: "Простое создание", text: "«Создай публичный репозиторий my-landing и залей туда HTML-сайт»" },
+              { num: "2", title: "С описанием", text: "«Сделай приватный репо todo-app, опиши его как React-приложение для задач»" },
+              { num: "3", title: "В существующий", text: "«Добавь в репозиторий boots новый файл styles.css с современными стилями»" },
+              { num: "4", title: "Целый проект", text: "«Напиши небольшой Python-скрипт и залей его в новый репозиторий»" }
+            ]
+          },
+          {
+            type: "code",
+            eyebrow: "Под капотом",
+            h2: "Что делает Grok",
+            intro: "Типичная последовательность вызовов:",
+            code: `<span class="fn">create_repository</span>(name: <span class="string">"my-app"</span>, private: false)<br><span class="fn">push_files</span>(<br>&nbsp;&nbsp;owner: <span class="string">"ты"</span>, repo: <span class="string">"my-app"</span>,<br>&nbsp;&nbsp;branch: <span class="string">"main"</span>,<br>&nbsp;&nbsp;files: [{ path, content }, ...],<br>&nbsp;&nbsp;message: <span class="string">"Initial commit"</span><br>)`
+          },
+          {
+            type: "title",
+            eyebrow: "Итог",
+            h1: "От идеи<br>до репозитория",
+            subtitle: "Опиши задачу — Grok создаст репо, напишет код и сделает коммит."
+          }
+        ]
+      },
+      {
+        id: "branches",
+        title: "Ветки, Pull Requests и Issues",
+        desc: "Работа с ветками, создание PR и управление задачами через Issues",
+        slidesCount: 5,
+        slides: [
+          {
+            type: "title",
+            eyebrow: "Презентация 3",
+            h1: "Ветки, Pull Requests<br>и Issues",
+            subtitle: "Полноценный workflow разработки: feature-ветки, ревью и задачи."
+          },
+          {
+            type: "cards",
+            eyebrow: "Возможности",
+            h2: "Что доступно",
+            cards: [
+              { icon: "🌿", title: "Создать ветку", text: "От main или любой другой ветки — для новой фичи или фикса." },
+              { icon: "🔀", title: "Pull Request", text: "Открыть PR, добавить описание, назначить ревьюеров." },
+              { icon: "📋", title: "Issues", text: "Создавать, обновлять и закрывать задачи в репозитории." },
+              { icon: "💬", title: "Комментарии", text: "Писать и редактировать комментарии к issue и PR." }
+            ]
+          },
+          {
+            type: "steps",
+            eyebrow: "Сценарий",
+            h2: "Типичный feature-workflow",
+            steps: [
+              { num: "1", title: "Ветка", text: "«Создай ветку feature/login от main в репозитории my-app»" },
+              { num: "2", title: "Код", text: "«Напиши страницу логина и залей в эту ветку»" },
+              { num: "3", title: "PR", text: "«Создай pull request из feature/login в main с описанием»" },
+              { num: "4", title: "Issue", text: "«Создай issue: добавить валидацию email на форме логина»" }
+            ]
+          },
+          {
+            type: "features",
+            eyebrow: "Детали",
+            h2: "Что можно настроить",
+            features: [
+              "Название и описание PR",
+              "Draft или готовый к ревью",
+              "Назначение reviewers",
+              "Base и head ветки",
+              "Labels и assignees у issue",
+              "Закрытие issue с причиной",
+              "Обновление описания PR",
+              "Синхронизация ветки с base"
+            ]
+          },
+          {
+            type: "title",
+            eyebrow: "Итог",
+            h1: "Полный GitHub<br>workflow в чате",
+            subtitle: "Ветки, коммиты, PR и задачи — всё без выхода из диалога."
+          }
+        ]
+      },
+      {
+        id: "read",
+        title: "Чтение, поиск и анализ кода",
+        desc: "Как Grok читает твои репозитории, ищет код и объясняет структуру",
+        slidesCount: 5,
+        slides: [
+          {
+            type: "title",
+            eyebrow: "Презентация 4",
+            h1: "Чтение, поиск<br>и анализ кода",
+            subtitle: "Grok видит структуру репозиториев и может объяснить любой файл."
+          },
+          {
+            type: "cards",
+            eyebrow: "Что умеет",
+            h2: "Инструменты чтения",
+            cards: [
+              { icon: "📂", title: "Дерево файлов", text: "Показать структуру папок и файлов любого репозитория." },
+              { icon: "📄", title: "Содержимое файла", text: "Прочитать любой файл и объяснить, что в нём происходит." },
+              { icon: "🔎", title: "Поиск по коду", text: "Найти функции, классы, строки по всему GitHub или в репо." },
+              { icon: "📊", title: "Список репозиториев", text: "Показать все твои репо с описаниями и языками." }
+            ]
+          },
+          {
+            type: "steps",
+            eyebrow: "Примеры",
+            h2: "Что можно спросить",
+            steps: [
+              { num: "1", title: "Список", text: "«Покажи мои репозитории и кратко опиши, что они делают»" },
+              { num: "2", title: "Структура", text: "«Покажи дерево файлов в репозитории Skarbov»" },
+              { num: "3", title: "Файл", text: "«Прочитай index.html из boots и объясни структуру»" },
+              { num: "4", title: "Поиск", text: "«Найди все функции, связанные с login, в моих репозиториях»" }
+            ]
+          },
+          {
+            type: "features",
+            eyebrow: "Полезно для",
+            h2: "Когда это пригождается",
+            features: [
+              "Разобраться в чужом/старом коде",
+              "Быстро найти нужный файл",
+              "Подготовить рефакторинг",
+              "Проверить, что уже есть в проекте",
+              "Сравнить подходы в разных репо",
+              "Собрать обзор портфолио",
+              "Найти дублирование кода",
+              "Объяснить логику новичку"
+            ]
+          },
+          {
+            type: "title",
+            eyebrow: "Итог",
+            h1: "Репозиторий<br>как контекст",
+            subtitle: "Grok читает твой код и использует его как основу для правок и новых фич."
+          }
+        ]
+      },
+      {
+        id: "security",
+        title: "Безопасность и лучшие практики",
+        desc: "Права доступа, отзыв авторизации и как безопасно работать с Grok",
+        slidesCount: 5,
+        slides: [
+          {
+            type: "title",
+            eyebrow: "Презентация 5",
+            h1: "Безопасность<br>и лучшие практики",
+            subtitle: "Ты контролируешь доступ. Grok работает только в рамках выданных прав."
+          },
+          {
+            type: "cards",
+            eyebrow: "Контроль",
+            h2: "Что ты решаешь",
+            cards: [
+              { icon: "🔐", title: "Объём доступа", text: "При подключении можно дать доступ только к выбранным репозиториям." },
+              { icon: "↩️", title: "Отзыв в любой момент", text: "GitHub → Settings → Applications → Authorized OAuth Apps." },
+              { icon: "👁️", title: "Прозрачность", text: "Все коммиты и PR появляются в истории от твоего имени." },
+              { icon: "🛡️", title: "Нет скрытых действий", text: "Grok не может сделать то, на что нет разрешения в токене." }
+            ]
+          },
+          {
+            type: "steps",
+            eyebrow: "Рекомендации",
+            h2: "Лучшие практики",
+            steps: [
+              { num: "1", title: "Ограничивай scope", text: "Если не нужно — давай доступ только к нужным репозиториям, а не ко всем." },
+              { num: "2", title: "Проверяй коммиты", text: "После важных изменений загляни в историю репозитория." },
+              { num: "3", title: "Не храни секреты в коде", text: "API-ключи и пароли — в переменных окружения / Secrets, не в файлах." },
+              { num: "4", title: "Отзывай при необходимости", text: "Сменил пароль или закончил работу — можно отозвать доступ Grok." }
+            ]
+          },
+          {
+            type: "features",
+            eyebrow: "Важно помнить",
+            h2: "Ограничения",
+            features: [
+              "Grok не может включить GitHub Pages за тебя",
+              "Нет доступа к billing и billing-настройкам",
+              "Не может менять права других людей",
+              "Действует только в рамках OAuth-токена",
+              "Коммиты видны тебе и коллабораторам",
+              "Можно работать с приватными репо",
+              "Токен можно отозвать в любой момент",
+              "История действий сохраняется в GitHub"
+            ]
+          },
+          {
+            type: "title",
+            eyebrow: "Итог",
+            h1: "Ты — владелец,<br>Grok — инструмент",
+            subtitle: "Доступ выдаёшь ты. Все действия прозрачны. Контроль всегда за тобой."
+          }
+        ]
+      }
+    ];
 
+    // ========== RENDER MENU ==========
+    const menuGrid = document.getElementById('menuGrid');
+    presentations.forEach((p, i) => {
+      const card = document.createElement('button');
+      card.className = 'menu-card';
+      card.innerHTML = `
+        <div class="num">Презентация ${i + 1}</div>
+        <h2>${p.title}</h2>
+        <p>${p.desc}</p>
+        <div class="slides-count">${p.slides.length} слайдов</div>
+      `;
+      card.addEventListener('click', () => openPresentation(i));
+      menuGrid.appendChild(card);
+    });
+
+    // ========== PRESENTATION LOGIC ==========
+    let currentPres = 0;
+    let currentSlide = 0;
+
+    const menuEl = document.getElementById('menu');
+    const presEl = document.getElementById('presentation');
+    const slidesArea = document.getElementById('slidesArea');
+    const dotsEl = document.getElementById('dots');
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
     const progressText = document.getElementById('progressText');
     const progressFill = document.getElementById('progressFill');
-    const dotsContainer = document.getElementById('dots');
+    const presTitle = document.getElementById('presTitle');
 
-    // Create dots
-    for (let i = 0; i < total; i++) {
-      const dot = document.createElement('div');
-      dot.className = 'dot' + (i === 0 ? ' active' : '');
-      dot.addEventListener('click', () => goTo(i));
-      dotsContainer.appendChild(dot);
+    function renderSlideHTML(s) {
+      if (s.type === 'title') {
+        let badges = '';
+        if (s.badges) {
+          badges = `<div class="badge-row">${s.badges.map(b => `<span class="badge"><strong>${b.split(' ')[0]}</strong> ${b.split(' ').slice(1).join(' ')}</span>`).join('')}</div>`;
+        }
+        return `<div class="slide-inner">
+          <div class="eyebrow">${s.eyebrow}</div>
+          <h1 class="slide-h">${s.h1}</h1>
+          <p class="subtitle">${s.subtitle}</p>
+          ${badges}
+        </div>`;
+      }
+      if (s.type === 'cards') {
+        const cards = s.cards.map(c => `
+          <div class="card">
+            <div class="card-icon">${c.icon}</div>
+            <h3>${c.title}</h3>
+            <p>${c.text}</p>
+          </div>`).join('');
+        return `<div class="slide-inner">
+          <div class="eyebrow">${s.eyebrow}</div>
+          <h2 class="slide-h">${s.h2}</h2>
+          <div class="cards">${cards}</div>
+        </div>`;
+      }
+      if (s.type === 'steps') {
+        const steps = s.steps.map(st => `
+          <div class="step">
+            <div class="step-num">${st.num}</div>
+            <div><h3>${st.title}</h3><p>${st.text}</p></div>
+          </div>`).join('');
+        return `<div class="slide-inner">
+          <div class="eyebrow">${s.eyebrow}</div>
+          <h2 class="slide-h">${s.h2}</h2>
+          <div class="steps">${steps}</div>
+        </div>`;
+      }
+      if (s.type === 'code') {
+        return `<div class="slide-inner">
+          <div class="eyebrow">${s.eyebrow}</div>
+          <h2 class="slide-h">${s.h2}</h2>
+          <p style="margin-bottom:4px">${s.intro}</p>
+          <div class="code-block">${s.code}</div>
+        </div>`;
+      }
+      if (s.type === 'features') {
+        const feats = s.features.map(f => `
+          <div class="feature"><span class="feature-dot"></span>${f}</div>`).join('');
+        return `<div class="slide-inner">
+          <div class="eyebrow">${s.eyebrow}</div>
+          <h2 class="slide-h">${s.h2}</h2>
+          <div class="features">${feats}</div>
+        </div>`;
+      }
+      return '';
     }
 
-    function updateUI() {
-      slides.forEach((s, i) => s.classList.toggle('active', i === current));
-      document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
-      progressText.textContent = `${current + 1} / ${total}`;
-      progressFill.style.width = `${((current + 1) / total) * 100}%`;
-      prevBtn.disabled = current === 0;
-      nextBtn.disabled = current === total - 1;
-      nextBtn.textContent = current === total - 1 ? 'Готово' : 'Далее →';
-    }
+    function openPresentation(index) {
+      currentPres = index;
+      currentSlide = 0;
+      const p = presentations[index];
+      presTitle.textContent = p.title;
 
-    function goTo(index) {
-      if (index < 0 || index >= total) return;
-      current = index;
+      // Build slides
+      slidesArea.innerHTML = '';
+      p.slides.forEach((s, i) => {
+        const el = document.createElement('section');
+        el.className = 'slide' + (i === 0 ? ' active' : '') + (s.type === 'title' ? ' slide-title' : '');
+        el.dataset.index = i;
+        el.innerHTML = renderSlideHTML(s);
+        slidesArea.appendChild(el);
+      });
+
+      // Dots
+      dotsEl.innerHTML = '';
+      p.slides.forEach((_, i) => {
+        const d = document.createElement('div');
+        d.className = 'dot' + (i === 0 ? ' active' : '');
+        d.addEventListener('click', () => goTo(i));
+        dotsEl.appendChild(d);
+      });
+
+      menuEl.style.display = 'none';
+      presEl.classList.add('active');
       updateUI();
     }
 
-    prevBtn.addEventListener('click', () => goTo(current - 1));
+    function closePresentation() {
+      presEl.classList.remove('active');
+      menuEl.style.display = 'flex';
+    }
+
+    function updateUI() {
+      const p = presentations[currentPres];
+      const total = p.slides.length;
+      slidesArea.querySelectorAll('.slide').forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+      dotsEl.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+      progressText.textContent = `${currentSlide + 1} / ${total}`;
+      progressFill.style.width = `${((currentSlide + 1) / total) * 100}%`;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = false;
+      nextBtn.textContent = currentSlide === total - 1 ? 'В меню' : 'Далее →';
+    }
+
+    function goTo(index) {
+      const total = presentations[currentPres].slides.length;
+      if (index < 0 || index >= total) return;
+      currentSlide = index;
+      updateUI();
+    }
+
+    document.getElementById('backToMenu').addEventListener('click', closePresentation);
+    prevBtn.addEventListener('click', () => goTo(currentSlide - 1));
     nextBtn.addEventListener('click', () => {
-      if (current < total - 1) goTo(current + 1);
+      const total = presentations[currentPres].slides.length;
+      if (currentSlide >= total - 1) closePresentation();
+      else goTo(currentSlide + 1);
     });
 
     document.addEventListener('keydown', (e) => {
+      if (!presEl.classList.contains('active')) return;
       if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
         e.preventDefault();
-        goTo(current + 1);
+        const total = presentations[currentPres].slides.length;
+        if (currentSlide >= total - 1) closePresentation();
+        else goTo(currentSlide + 1);
       } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
         e.preventDefault();
-        goTo(current - 1);
-      } else if (e.key === 'Home') {
-        goTo(0);
-      } else if (e.key === 'End') {
-        goTo(total - 1);
+        goTo(currentSlide - 1);
+      } else if (e.key === 'Escape') {
+        closePresentation();
       }
     });
 
-    // Touch swipe
     let touchStartX = 0;
-    document.addEventListener('touchstart', e => {
-      touchStartX = e.changedTouches[0].screenX;
-    }, { passive: true });
-
+    document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
     document.addEventListener('touchend', e => {
+      if (!presEl.classList.contains('active')) return;
       const diff = e.changedTouches[0].screenX - touchStartX;
       if (Math.abs(diff) > 50) {
-        if (diff < 0) goTo(current + 1);
-        else goTo(current - 1);
+        if (diff < 0) {
+          const total = presentations[currentPres].slides.length;
+          if (currentSlide >= total - 1) closePresentation();
+          else goTo(currentSlide + 1);
+        } else goTo(currentSlide - 1);
       }
     }, { passive: true });
-
-    updateUI();
   </script>
 </body>
 </html>
